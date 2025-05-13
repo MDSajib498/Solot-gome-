@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel</title>
+  <style>
+    body { font-family: Arial; background: #111; color: #fff; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 10px; border: 1px solid #444; }
+    input { width: 60px; }
+    button { padding: 4px 8px; }
+    h2 { text-align: center; }
+  </style>
+</head>
+<body>
+  <h2>Admin Panel</h2>
+  <div id="userList"></div>
+
+  <script>
+    function getUsers() {
+      return JSON.parse(localStorage.getItem("users") || "[]");
+    }
+
+    function saveUsers(users) {
+      localStorage.setItem("users", JSON.stringify(users));
+    }
+
+    function renderUsers() {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user) return document.getElementById("userList").innerHTML = "<p>No user data</p>";
+
+      const users = [user];
+      let html = `<table><tr><th>Username</th><th>Balance</th><th>Update</th><th>Spins</th></tr>`;
+      users.forEach((u, i) => {
+        html += `<tr>
+          <td>${u.username}</td>
+          <td><input type="number" value="${u.balance}" id="bal${i}" /></td>
+          <td><button onclick="updateBalance(${i})">Save</button></td>
+          <td><button onclick="showSpins(${i})">View</button></td>
+        </tr>`;
+      });
+      html += `</table><div id="spinDetail" style="margin-top:20px;"></div>`;
+      document.getElementById("userList").innerHTML = html;
+    }
+
+    function updateBalance(index) {
+      const user = JSON.parse(localStorage.getItem("user"));
+      user.balance = parseInt(document.getElementById(`bal${index}`).value);
+      localStorage.setItem("user", JSON.stringify(user));
+      alert("Balance updated!");
+      renderUsers();
+    }
+
+    function showSpins(index) {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const spins = user.spins || [];
+      let spinHTML = `<h3>Spin History for ${user.username}</h3><ul>`;
+      spins.forEach(s => {
+        spinHTML += `<li>${s.time} - [${s.r1} ${s.r2} ${s.r3}] Win: $${s.win}</li>`;
+      });
+      spinHTML += `</ul>`;
+      document.getElementById("spinDetail").innerHTML = spinHTML;
+    }
+
+    renderUsers();
+  </script>
+</body>
+</html>

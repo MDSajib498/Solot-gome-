@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Slot Game</title>
+  <style>
+    body { font-family: Arial; text-align: center; background: #222; color: white; }
+    #slots { font-size: 60px; margin: 20px 0; }
+    button { font-size: 20px; padding: 10px 20px; }
+    #balance { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Slot Game</h1>
+  <div id="slots">🍒 🍋 🍊</div>
+  <button onclick="spin()">Spin</button>
+  <div id="balance">Balance: $<span id="bal">100</span></div>
+
+  <script>
+    let symbols = ['🍒','🍋','🍊','⭐','💎'];
+    let user = JSON.parse(localStorage.getItem('user')) || { username: 'player', balance: 100, spins: [] };
+    localStorage.setItem('user', JSON.stringify(user));
+
+    function spin() {
+      if (user.balance <= 0) {
+        alert('Not enough balance!');
+        return;
+      }
+      user.balance -= 10;
+      let r1 = symbols[Math.floor(Math.random() * symbols.length)];
+      let r2 = symbols[Math.floor(Math.random() * symbols.length)];
+      let r3 = symbols[Math.floor(Math.random() * symbols.length)];
+      document.getElementById('slots').innerText = `${r1} ${r2} ${r3}`;
+      let win = 0;
+      if (r1 === r2 && r2 === r3) win = 100;
+      else if (r1 === r2 || r2 === r3 || r1 === r3) win = 20;
+      user.balance += win;
+      user.spins.push({ time: new Date().toLocaleString(), r1, r2, r3, win });
+      document.getElementById('bal').innerText = user.balance;
+      localStorage.setItem('user', JSON.stringify(user));
+    }
+
+    document.getElementById('bal').innerText = user.balance;
+  </script>
+</body>
+</html>
